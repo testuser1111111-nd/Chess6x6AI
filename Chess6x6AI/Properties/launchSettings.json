@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Chess6x6AI": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
