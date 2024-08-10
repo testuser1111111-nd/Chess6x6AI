@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.NetworkInformation;
 using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Chess6x6AI
@@ -15,6 +11,144 @@ namespace Chess6x6AI
     public class BoardOps
     {
         //10^-6secを目指したい
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+        static public SynchronizedCollection<(BitBoard,int,int,char)> GenBoard(BitBoard board)
+        {
+            SynchronizedCollection<(BitBoard,int,int,char)> boacol = new SynchronizedCollection<(BitBoard,int,int,char)>();
+            if (board.wturn)
+            {
+                for(int i = 0; i < 36; i++)
+                {
+                    if ((board.wPawn & (1ul << i)) > 0)
+                    {
+                        int[] d = { 5, 6, 7 };
+                        char[] nx = { 'B', 'N', 'R', 'Q' };
+                        foreach(var a in d)
+                        {
+                            foreach(var b in nx)
+                            {
+                                var next = NextBoard(board, i, i + a,b);
+                                if (next != null) boacol.Add((next,i,i+a,b));
+                            }
+                        }
+                    }else if((board.wBishop & (1ul << i))>0)
+                    {
+                        int[] d = { 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, -5, -10, -15, -20, -25, -7, -14, -21, -28, -35 };
+                        foreach(var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if(next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.wKnight & (1ul << i)) > 0)
+                    {
+                        int[] d = { 6,11,9,4,-4,-9,-11,-6};
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.wRook & (1ul << i)) > 0)
+                    {
+                        int[] d = { 1,2,3,4,5,-1,-2,-3,-4,-5,6,12,18,24,30,-6,-12,-18,-24,-30 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.wQueen & (1ul << i)) > 0)
+                    {
+                        int[] d = { 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, -5, -10, -15, -20, -25, -7, -14, -21, -28, -35, 1, 2, 3, 4, 5, -1, -2, -3, -4, -5, 6, 12, 18, 24, 30, -6, -12, -18, -24, -30 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.wKing & (1ul << i)) > 0)
+                    {
+                        int[] d = { 1,5,6,7,-1,-5,-6,-7 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                for (int i = 0; i < 36; i++)
+                {
+                    if ((board.bPawn & (1ul << i)) > 0)
+                    {
+                        int[] d = { 5, 6, 7 };
+                        char[] nx = { 'B', 'N', 'R', 'Q' };
+                        foreach (var a in d)
+                        {
+                            foreach (var b in nx)
+                            {
+                                var next = NextBoard(board, i, i + a, b);
+                                if (next != null) boacol.Add((next, i, i + a, 'P'));
+                            }
+                        }
+                    }
+                    else if ((board.bBishop & (1ul << i)) > 0)
+                    {
+                        int[] d = { 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, -5, -10, -15, -20, -25, -7, -14, -21, -28, -35 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.bKnight & (1ul << i)) > 0)
+                    {
+                        int[] d = { 6, 11, 9, 4, -4, -9, -11, -6 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.bRook & (1ul << i)) > 0)
+                    {
+                        int[] d = { 1, 2, 3, 4, 5, -1, -2, -3, -4, -5, 6, 12, 18, 24, 30, -6, -12, -18, -24, -30 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.bQueen & (1ul << i)) > 0)
+                    {
+                        int[] d = { 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, -5, -10, -15, -20, -25, -7, -14, -21, -28, -35, 1, 2, 3, 4, 5, -1, -2, -3, -4, -5, 6, 12, 18, 24, 30, -6, -12, -18, -24, -30 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                    else if ((board.bKing & (1ul << i)) > 0)
+                    {
+                        int[] d = { 1, 5, 6, 7, -1, -5, -6, -7 };
+                        foreach (var a in d)
+                        {
+                            var next = NextBoard(board, i, i + a, 'Q');
+                            if (next != null) boacol.Add((next, i, i + a, 'P'));
+                        }
+                    }
+                }
+            }
+            return boacol;
+        }
+
+
+
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         static int CheckLine(BitBoard board, int cur, int fin)
         {
@@ -62,7 +196,10 @@ namespace Chess6x6AI
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         static public BitBoard? NextBoard(BitBoard board, int cur,int fin,char pp)
         {
-            Stopwatch sw = Stopwatch.StartNew();
+            if (cur<0 | cur>=36 | fin<0 | fin>=36)
+            {
+                return null;
+            }
             BitBoard temp = DeepCopy(board);
             ulong curpos = 1;
             ulong finpos = 1;
@@ -73,7 +210,7 @@ namespace Chess6x6AI
             char nextpiece = GetPiece(board, finpos);
             if (piece == ' ') return null;
             if ((char.IsLower(piece) == char.IsLower(nextpiece)) & nextpiece != ' ') return null;
-            if (char.IsUpper(piece) ^ board.wturn)return null; 
+            if (char.IsUpper(piece) ^ board.wturn)return null;
             if (piece == 'P')
             {
                 if (((cur+5 == fin & cur%6!=0)|(cur+7 ==fin & cur%6!=5)) & nextpiece != ' ')
@@ -88,6 +225,8 @@ namespace Chess6x6AI
                 temp.wall ^= curpos ^ finpos;
                 if (fin/6==5)
                 {
+                    temp.wPawn ^= finpos;
+                    temp.wall ^= finpos;
                     if (char.ToUpper(pp)=='P') return null;
                     Change(ref temp, char.ToUpper(pp), finpos);
                 }
@@ -106,6 +245,8 @@ namespace Chess6x6AI
                 temp.ball ^= curpos ^ finpos;
                 if (fin/6 == 0)
                 {
+                    temp.bPawn ^= finpos;
+                    temp.wall ^= finpos;
                     if (char.ToUpper(pp) == 'P') return null;
                     Change(ref temp, char.ToLower(pp), finpos);
                 }
@@ -286,16 +427,17 @@ namespace Chess6x6AI
             }
             for (int i = -1; i <= 1; i++)
             {
+                if (x1 + i < 0 | x1 + i >= 6) continue;
                 for (int j = -1; j <= 1; j++)
                 {
                     int x2 = x1 + i;
                     int y2 = y1 + j;
-                    if (x2 < 0 | x2 >= 6 | y2 < 0 | y2 >= 6) continue;
+                    if (y2 < 0 | y2 >= 6) continue;
                     if ((temp.wKing & (1ul << (y2 * 6 + x2))) > 0) bcheck = true;
                 }
             }
-            if (y1 > 0 && x1 > 1 && (temp.wPawn & (1ul << (bkingpos - 7))) > 0) bcheck = true;
-            if (y1 > 0 && x1 < 5 && (temp.wPawn & (1ul << (bkingpos - 5))) > 0) bcheck = true;
+            if ((temp.bKing&0b111110111110111110111110000000000000)>0 & (temp.wPawn & (temp.bKing>>7)) > 0) bcheck = true;
+            if ((temp.bKing&0b011111011111011111011111000000000000)>0 & (temp.wPawn & (temp.bKing>>5)) > 0) bcheck = true;
 
             bool wcheck = false;
             int wkingpos = BitOperations.Log2(temp.wKing);
@@ -320,7 +462,6 @@ namespace Chess6x6AI
             }
             for (int i = 0; i < 4; i++)
             {
-                
                 for (int j = 1; j < 6; j++)
                 {
                     int x2 = x1 + BQd[i].Item1 * j;
@@ -332,16 +473,17 @@ namespace Chess6x6AI
             }
             for (int i = -1; i <= 1; i++)
             {
+                if (x1 + i < 0 | x1 + i >= 6) continue;
                 for (int j = -1; j <= 1; j++)
                 {
                     int x2 = x1 + i;
                     int y2 = y1 + j;
-                    if (x2 < 0 | x2 >= 6 | y2 < 0 | y2 >= 6) continue;
+                    if (y2 < 0 | y2 >= 6) continue;
                     if ((temp.bKing & (1ul << (y2 * 6 + x2))) > 0) wcheck = true;
                 }
             }
-            if (y1 <5 && x1 > 1 && (temp.bPawn & (1ul << (wkingpos +5))) > 0) wcheck = true;
-            if (y1 <5 && x1 < 5 && (temp.bPawn & (1ul << (wkingpos +7))) > 0) wcheck = true;
+            if ((temp.wKing&0b000000000000111110111110111110111110) >0& (temp.bPawn & (temp.wKing<<5)) > 0) wcheck = true;
+            if ((temp.wKing&0b000000000000011111011111011111011111) >0& (temp.bPawn & (temp.wKing<<7)) > 0) wcheck = true;
             temp.bcheck = bcheck;
             temp.wcheck = wcheck;
             //*
@@ -350,7 +492,6 @@ namespace Chess6x6AI
                 return null;
             }
             //*/
-            Console.WriteLine(sw.Elapsed.ToString());
             return temp;
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
@@ -368,7 +509,7 @@ namespace Chess6x6AI
                 case 'r': board.bRook ^= cappos; break;
                 case 'Q': board.wQueen ^= cappos; break;
                 case 'q': board.bQueen ^= cappos; break;
-                default: throw new InvalidOperationException();
+                //default: throw new InvalidOperationException();   ///絶対来ないはず
             }
             if (char.IsLower(piece))
             {
