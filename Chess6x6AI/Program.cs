@@ -66,9 +66,9 @@ namespace Chess6x6AI
                 int score = int.MaxValue;
                 int ncur= 0, nfin = 0;
                 char np = ' ';
-                Parallel.ForEach(next, a => {
-
-                    var eval = minmax(a.Item1, 4);//なんかおかしい
+                foreach(var a in next)
+                {
+                    var eval = minmax(a.Item1, 4);
                     if (eval < score)
                     {
                         score = eval;
@@ -77,7 +77,7 @@ namespace Chess6x6AI
                         nfin = a.Item3;
                         np = a.Item4;
                     }
-                });
+                }
                 test = minboard;
                 Console.WriteLine(minboard);
                 Console.WriteLine(ncur+" "+nfin+" "+np+" "+score);
