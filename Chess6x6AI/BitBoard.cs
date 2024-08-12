@@ -10,6 +10,7 @@ namespace Chess6x6AI
 {
     public class BitBoard
     {
+        public int turn;
         public bool wturn;
         public ulong wPawn;
         public ulong bPawn;
@@ -28,7 +29,7 @@ namespace Chess6x6AI
         public bool wcheck;
         public bool bcheck;
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        public BitBoard(bool wturn, ulong wBishop, ulong bBishop, ulong wKnight, ulong bKnight, ulong wRook, ulong bRook, ulong wQueen, ulong bQueen, ulong wKing, ulong bKing, ulong wPawn = (1uL << 6) * 63, ulong bPawn = (1uL << 24) * 63)
+        public BitBoard(bool wturn, ulong wBishop, ulong bBishop, ulong wKnight, ulong bKnight, ulong wRook, ulong bRook, ulong wQueen, ulong bQueen, ulong wKing, ulong bKing, ulong wPawn = (1uL << 6) * 63, ulong bPawn = (1uL << 24) * 63, int turn = 0)
         {
             this.wturn = wturn;
             this.wPawn = wPawn;
@@ -43,10 +44,11 @@ namespace Chess6x6AI
             this.bQueen = bQueen;
             this.wKing = wKing;
             this.bKing = bKing;
-            this.wall = wPawn|wBishop|wKnight|wRook|wQueen;
+            this.wall = wPawn | wBishop | wKnight | wRook | wQueen;
             this.ball = bPawn | bBishop | bKnight | bRook | bQueen;
             this.wcheck = false;
             this.bcheck = false;
+            this.turn = turn;
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         public override string ToString()
@@ -93,6 +95,7 @@ namespace Chess6x6AI
         {
             if(obj == null || !(obj is BitBoard)) return false;
             return 
+                this.turn == ((BitBoard)obj).turn &
                 this.wturn == ((BitBoard)obj).wturn &
                 this.wPawn == ((BitBoard)obj).wPawn &
                 this.bPawn == ((BitBoard)obj).bPawn &

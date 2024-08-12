@@ -43,7 +43,7 @@ namespace Chess6x6AI
                     }
                     else if ((board.wKnight & (1ul << i)) > 0)
                     {
-                        int[] d = { 6,11,9,4,-4,-9,-11,-6};
+                        int[] d = { 8,11,13,4,-4,-13,-11,-8};
                         foreach (var a in d)
                         {
                             var next = NextBoard(board, i, i + a, 'Q');
@@ -86,7 +86,7 @@ namespace Chess6x6AI
                 {
                     if ((board.bPawn & (1ul << i)) > 0)
                     {
-                        int[] d = { 5, 6, 7 };
+                        int[] d = { -5, -6, -7 };
                         char[] nx = { 'B', 'N', 'R', 'Q' };
                         foreach (var a in d)
                         {
@@ -108,7 +108,7 @@ namespace Chess6x6AI
                     }
                     else if ((board.bKnight & (1ul << i)) > 0)
                     {
-                        int[] d = { 6, 11, 9, 4, -4, -9, -11, -6 };
+                        int[] d = { 8, 11, 13, 4, -4, -13, -11, -8 };
                         foreach (var a in d)
                         {
                             var next = NextBoard(board, i, i + a, 'Q');
@@ -539,6 +539,6 @@ namespace Chess6x6AI
             return box;
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        static BitBoard DeepCopy(BitBoard board) => new BitBoard(!board.wturn,board.wBishop,board.bBishop,board.wKnight,board.bKnight,board.wRook,board.bRook,board.wQueen,board.bQueen,board.wKing,board.bKing,board.wPawn,board.bPawn);
+        static BitBoard DeepCopy(BitBoard board) => new BitBoard(!board.wturn,board.wBishop,board.bBishop,board.wKnight,board.bKnight,board.wRook,board.bRook,board.wQueen,board.bQueen,board.wKing,board.bKing,board.wPawn,board.bPawn,board.turn+1);
     }
 }

@@ -11,6 +11,7 @@ namespace Chess6x6AI
 {
     internal class Program
     {
+        static int minmaxcalled = 0;
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         static void Main(string[] args)
         {
@@ -45,6 +46,7 @@ namespace Chess6x6AI
                 }
                 Console.WriteLine(test);
                 var next = BoardOps.GenBoard(test);
+                
                 if (next.Count == 0)
                 {
                     if (test.wturn)
@@ -62,13 +64,17 @@ namespace Chess6x6AI
                     Console.WriteLine(test.wcheck ? "white king got checked." : "");
                     Console.WriteLine(test.bcheck ? "black king got checked." : "");
                 }
+                if (test.turn >= 75)
+                {
+                    Console.WriteLine("time over"); return;
+                }
                 BitBoard minboard = null;
                 int score = int.MaxValue;
                 int ncur= 0, nfin = 0;
                 char np = ' ';
                 foreach(var a in next)
                 {
-                    var eval = minmax(a.Item1, 4);
+                    var eval = minmax(a.Item1, 3);//実質5手見てる
                     if (eval < score)
                     {
                         score = eval;
@@ -78,6 +84,8 @@ namespace Chess6x6AI
                         np = a.Item4;
                     }
                 }
+                Console.WriteLine(minmaxcalled);
+                minmaxcalled = 0;
                 test = minboard;
                 Console.WriteLine(minboard);
                 Console.WriteLine(ncur+" "+nfin+" "+np+" "+score);
@@ -99,6 +107,10 @@ namespace Chess6x6AI
                     Console.WriteLine(test.wcheck ? "white king got checked." : "");
                     Console.WriteLine(test.bcheck ? "black king got checked." : "");
                 }
+                if (test.turn >= 75)
+                {
+                    Console.WriteLine("time over");
+                }
                 Console.WriteLine(sw.Elapsed);
                 sw.Stop();
                 sw.Reset();
@@ -107,11 +119,16 @@ namespace Chess6x6AI
         
         static int minmax(BitBoard board,int depth)
         {
+            if (board.turn >= 75)
+            {
+                return 0;
+            }
             var next = BoardOps.GenBoard(board);
+            minmaxcalled += next.Count;
             if(next.Count == 0)
             {
-                if(board.wcheck&board.wturn)return -100 ;
-                if (board.bcheck& !board.wturn) return 100;
+                if(board.wcheck&board.wturn)return -100-depth;
+                if (board.bcheck& !board.wturn) return 100+depth;
                 return 0;
             }
             if (depth == 0)
@@ -126,8 +143,7 @@ namespace Chess6x6AI
                     BitOperations.PopCount(board.bBishop) * -3 +
                     BitOperations.PopCount(board.bKnight) * -3 +
                     BitOperations.PopCount(board.bRook) * -5 +
-                    BitOperations.PopCount(board.bQueen) * -9)
-                    * (board.wturn ? 1 : -1);
+                    BitOperations.PopCount(board.bQueen) * -9);
             }
             if (board.wturn)
             {
