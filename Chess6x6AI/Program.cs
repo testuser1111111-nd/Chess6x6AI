@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Chess6x6AI;
+using SkiaSharp;
 using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -6,6 +7,8 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
+using static Tensorboard.CostGraphDef.Types;
+using static TorchSharp.torch;
 
 namespace Chess6x6AI
 {
@@ -68,6 +71,7 @@ namespace Chess6x6AI
                 {
                     Console.WriteLine("time over"); return;
                 }
+                /*
                 BitBoard minboard = null;
                 int score = int.MaxValue;
                 int ncur= 0, nfin = 0;
@@ -87,8 +91,12 @@ namespace Chess6x6AI
                 Console.WriteLine(minmaxcalled);
                 minmaxcalled = 0;
                 test = minboard;
+                
                 Console.WriteLine(minboard);
                 Console.WriteLine(ncur+" "+nfin+" "+np+" "+score);
+                */
+                test = MCTS(test, 100000);
+                Console.WriteLine(test);
                 var next2 = BoardOps.GenBoard(test);
                 if (next2.Count == 0)
                 {
@@ -166,6 +174,90 @@ namespace Chess6x6AI
                 return min;
             }
 
+        }
+
+
+        static Random random = new Random();
+
+        static BitBoard MCTS(BitBoard root, int simulations)
+        {
+            Node rootNode = new Node(root, null);
+            // シミュレーションを繰り返す
+            for (int i = 0; i<simulations; i++)
+            {
+                // 1. Selection: UCB1で子ノードを選択
+                Node node = rootNode;
+                while (node.Children.Count > 0)
+                {
+                        node = node.Children.OrderByDescending(n => n.UCB1()).First();
+                }
+                // 2. Expansion: 新しい子ノードを作成
+                var possibleMoves = BoardOps.GenBoard(node.Board);
+                if (possibleMoves.Count > 0)
+                {
+                    var randomMove = possibleMoves[random.Next(possibleMoves.Count)];
+                    BitBoard newBoard = randomMove.Item1;
+                    Node childNode = new Node(newBoard, node, randomMove.Item2, randomMove.Item3, randomMove.Item4);
+                    node.Children.Add(childNode);
+                    node = childNode;
+                }
+                // 3. Simulation: ランダムプレイアウト
+                int result = Simulate(node.Board);
+                // 4. Backpropagation: 結果を親ノードに反映
+                while (node != null)
+                {
+                    node.Visits++;
+                    node.Wins += result;
+                    node = node.Parent;
+                }
+            }
+            // 最も訪問された子ノードを次の手として選択
+            return rootNode.Children.OrderByDescending(n => n.Visits).First().Board;
+        }
+        // ランダムプレイアウトを行う関数
+        static int Simulate(BitBoard board)
+        {
+            BitBoard tempBoard = board;
+            while (true)
+            {
+                var possibleMoves = BoardOps.GenBoard(tempBoard);
+                if (possibleMoves.Count == 0)
+                {
+                    if (tempBoard.wcheck & tempBoard.wturn) return -1; // ブラックの勝ち
+                    if (tempBoard.bcheck & !tempBoard.wturn) return 1;  // ホワイトの勝ち
+                    return 0; // 引き分け
+                }
+                var randomMove = possibleMoves[random.Next(possibleMoves.Count)];
+                tempBoard = randomMove.Item1;
+                if (tempBoard.turn >= 75) return 0; // 手数制限による引き分け
+            }
+        }
+    }
+    // ノードの情報を格納するためのクラス
+    class Node
+    {
+        public BitBoard Board;
+        public Node Parent;
+        public List<Node> Children = new List<Node>();
+        public int Wins = 0;
+        public int Visits = 0;
+        public int MoveFrom, MoveTo;
+        public char Promotion;
+
+        public Node(BitBoard board, Node parent, int moveFrom = 0, int moveTo = 0, char promotion = ' ')
+        {
+            Board = board;
+            Parent = parent;
+            MoveFrom = moveFrom;
+            MoveTo = moveTo;
+            Promotion = promotion;
+        }
+
+        // UCB1を計算する関数
+        public double UCB1(double c = 1.41)
+        {
+            if (Visits == 0) return double.MaxValue;
+            return (double)Wins / Visits + c * Math.Sqrt(Math.Log(Parent.Visits) / Visits);
         }
     }
 }
