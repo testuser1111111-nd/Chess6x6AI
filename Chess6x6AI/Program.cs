@@ -10,7 +10,7 @@ namespace Chess6x6AI
     internal class Program
     {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        static void Main(string[] args)
+        static void Main3(string[] args)
         {
             BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
             Console.WriteLine(test);
@@ -113,6 +113,36 @@ namespace Chess6x6AI
                 sw.Stop();
                 sw.Reset();
             }
+        }
+        static void Main()
+        {
+            Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
+            Random random = new Random (42);
+            while (dict.Keys.Count <= 1000)//300000に後でする　今はプログラムのテスト
+            {
+                BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
+                while (true)
+                {
+                    //wturn
+                    Console.WriteLine(test);
+                    var nextmove = BoardOps.GenBoard (test);
+                    if(!dict.ContainsKey(test))dict.Add(test, (test.halfKP(), BoardOps.EvalBoard(test, 4)));
+                    if (nextmove.Count == 0) break;
+                    if (test.turn >= 100) break;
+                    test = nextmove[random.Next(nextmove.Count)].Item1;
+                    if (dict.Keys.Count > 100000) break;
+                    //bturn
+                    Console.WriteLine(test);
+                    nextmove = BoardOps.GenBoard(test);
+                    if (!dict.ContainsKey(test)) dict.Add(test, (test.halfKP(), BoardOps.EvalBoard(test, 4)));
+                    if (nextmove.Count == 0) break;
+                    if(test.turn >= 100) break;
+                    test = nextmove[random.Next(nextmove.Count)].Item1;
+                    if (dict.Keys.Count > 100000) break;
+                    Console.WriteLine(dict.Keys.Count);
+                }
+            }
+            FileControl.Output(dict.Values.ToArray());
         }
     }
 }
