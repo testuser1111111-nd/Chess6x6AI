@@ -10,7 +10,6 @@ namespace Chess6x6AI
 {
     public class BoardOps
     {
-        //10^-6secを目指したい
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         static public SynchronizedCollection<(BitBoard,int,int,char)> GenBoard(BitBoard board)
@@ -23,7 +22,7 @@ namespace Chess6x6AI
                     if ((board.wPawn & (1ul << i)) > 0)
                     {
                         int[] d = { 5, 6, 7 };
-                        char[] nx = { 'B', 'N', 'R', 'Q' };
+                        char[] nx = { /*'B',*/ 'N', 'R', 'Q' };
                         foreach(var a in d)
                         {
                             foreach(var b in nx)
@@ -32,7 +31,8 @@ namespace Chess6x6AI
                                 if (next != null) boacol.Add((next,i,i+a,b));
                             }
                         }
-                    }else if((board.wBishop & (1ul << i))>0)
+                    }/*
+                    else if((board.wBishop & (1ul << i))>0)
                     {
                         int[] d = { 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, -5, -10, -15, -20, -25, -7, -14, -21, -28, -35 };
                         foreach(var a in d)
@@ -40,7 +40,7 @@ namespace Chess6x6AI
                             var next = NextBoard(board, i, i + a, 'Q');
                             if(next != null) boacol.Add((next, i, i + a, 'P'));
                         }
-                    }
+                    }*/
                     else if ((board.wKnight & (1ul << i)) > 0)
                     {
                         int[] d = { 8,11,13,4,-4,-13,-11,-8};
@@ -87,7 +87,7 @@ namespace Chess6x6AI
                     if ((board.bPawn & (1ul << i)) > 0)
                     {
                         int[] d = { -5, -6, -7 };
-                        char[] nx = { 'B', 'N', 'R', 'Q' };
+                        char[] nx = { /*'B',*/ 'N', 'R', 'Q' };
                         foreach (var a in d)
                         {
                             foreach (var b in nx)
@@ -96,7 +96,7 @@ namespace Chess6x6AI
                                 if (next != null) boacol.Add((next, i, i + a, 'P'));
                             }
                         }
-                    }
+                    }/*
                     else if ((board.bBishop & (1ul << i)) > 0)
                     {
                         int[] d = { 7, 14, 21, 28, 35, 5, 10, 15, 20, 25, -5, -10, -15, -20, -25, -7, -14, -21, -28, -35 };
@@ -105,7 +105,7 @@ namespace Chess6x6AI
                             var next = NextBoard(board, i, i + a, 'Q');
                             if (next != null) boacol.Add((next, i, i + a, 'P'));
                         }
-                    }
+                    }*/
                     else if ((board.bKnight & (1ul << i)) > 0)
                     {
                         int[] d = { 8, 11, 13, 4, -4, -13, -11, -8 };
@@ -147,8 +147,6 @@ namespace Chess6x6AI
             return boacol;
         }
 
-
-
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         static int CheckLine(BitBoard board, int cur, int fin)
         {
@@ -184,7 +182,7 @@ namespace Chess6x6AI
             {
                 check = (((1ul << cur) - (1ul << fin)) / ((1ul << d) - 1)) - (1ul << fin);
             }
-            if (((board.wall | board.ball | board.wKing | board.bKing) & check) > 0)
+            if (((board.wall | board.ball ) & check) > 0)
             {
                 return 0;
             }
@@ -282,6 +280,7 @@ namespace Chess6x6AI
                 if (Math.Abs(fin % 6 - cur % 6) <= 1 & Math.Abs(fin / 6 - cur / 6) <= 1)
                 {
                     temp.wKing ^= curpos ^ finpos;
+                    temp.wall ^= curpos ^ finpos;
                     if (nextpiece != ' ') Change(ref temp, nextpiece, finpos);
                 }
                 else
@@ -295,6 +294,7 @@ namespace Chess6x6AI
                 if (Math.Abs(fin % 6 - cur % 6) <= 1 & Math.Abs(fin / 6 - cur / 6) <= 1)
                 {
                     temp.bKing ^= curpos ^ finpos;
+                    temp.ball ^= curpos ^ finpos;
                     if (nextpiece != ' ') Change(ref temp, nextpiece, finpos);
                 }
                 else
@@ -332,7 +332,7 @@ namespace Chess6x6AI
                         break;
                 }
             }
-            else if (piece == 'B')
+            /*else if (piece == 'B')
             {
                 int d = CheckLine(board, cur, fin);
                 switch (d)
@@ -361,7 +361,7 @@ namespace Chess6x6AI
                         if (nextpiece != ' ') Change(ref temp, nextpiece, finpos);
                         break;
                 }
-            }
+            }//*/
             else if(piece == 'Q')
             {
                 int d = CheckLine(board, cur, fin);
@@ -421,7 +421,7 @@ namespace Chess6x6AI
                     int x2 = x1 + BQd[i].Item1 * j;
                     int y2 = y1 + BQd[i].Item2 * j;
                     if (x2 < 0 | x2 >= 6 | y2 < 0 | y2 >= 6) break;
-                    if (((temp.wBishop | temp.wQueen) & (1ul << (y2 * 6 + x2))) > 0) bcheck = true;
+                    if (((/*temp.wBishop | */temp.wQueen) & (1ul << (y2 * 6 + x2))) > 0) bcheck = true;
                     if (((temp.wall | temp.ball | temp.wKing | temp.bKing) & (1ul << (y2 * 6 + x2))) > 0) break;
                 }
             }
@@ -467,7 +467,7 @@ namespace Chess6x6AI
                     int x2 = x1 + BQd[i].Item1 * j;
                     int y2 = y1 + BQd[i].Item2 * j;
                     if (x2 < 0 | x2 >= 6 | y2 < 0 | y2 >= 6) break;
-                    if (((temp.bBishop | temp.bQueen) & (1ul << (y2 * 6 + x2))) > 0) wcheck = true;
+                    if (((/*temp.bBishop |*/ temp.bQueen) & (1ul << (y2 * 6 + x2))) > 0) wcheck = true;
                     if (((temp.wall | temp.ball | temp.wKing | temp.bKing) & (1ul << (y2 * 6 + x2))) > 0) break;
                 }
             }
@@ -501,15 +501,15 @@ namespace Chess6x6AI
             {
                 case 'P': board.wPawn ^= cappos; break;
                 case 'p': board.bPawn ^= cappos; break;
-                case 'B': board.wBishop ^= cappos; break;
-                case 'b': board.bBishop ^= cappos; break;
+                //case 'B': board.wBishop ^= cappos; break;
+                //case 'b': board.bBishop ^= cappos; break;
                 case 'N': board.wKnight ^= cappos; break;
                 case 'n': board.bKnight ^= cappos; break;
                 case 'R': board.wRook ^= cappos; break;
                 case 'r': board.bRook ^= cappos; break;
                 case 'Q': board.wQueen ^= cappos; break;
                 case 'q': board.bQueen ^= cappos; break;
-                //default: throw new InvalidOperationException();   ///絶対来ないはず
+                default: throw new InvalidOperationException();   ///絶対来ないはず
             }
             if (char.IsLower(piece))
             {
@@ -526,8 +526,8 @@ namespace Chess6x6AI
             char box = ' ';
             if ((board.wPawn & position) > 0) box = 'P';
             if ((board.bPawn & position) > 0) box = 'p';
-            if ((board.wBishop & position) > 0) box = 'B';
-            if ((board.bBishop & position) > 0) box = 'b';
+            //if ((board.wBishop & position) > 0) box = 'B';
+            //if ((board.bBishop & position) > 0) box = 'b';
             if ((board.wKnight & position) > 0) box = 'N';
             if ((board.bKnight & position) > 0) box = 'n';
             if ((board.wRook & position) > 0) box = 'R';
@@ -539,6 +539,143 @@ namespace Chess6x6AI
             return box;
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        static BitBoard DeepCopy(BitBoard board) => new BitBoard(!board.wturn,board.wBishop,board.bBishop,board.wKnight,board.bKnight,board.wRook,board.bRook,board.wQueen,board.bQueen,board.wKing,board.bKing,board.wPawn,board.bPawn,board.turn+1);
+        static BitBoard DeepCopy(BitBoard board) => new BitBoard(!board.wturn,/*board.wBishop,board.bBishop,*/board.wKnight,board.bKnight,board.wRook,board.bRook,board.wQueen,board.bQueen,board.wKing,board.bKing,board.wPawn,board.bPawn,board.turn+1);
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+        public static int EvalBoard(BitBoard board,int depth)
+        {
+            return Negamax(board, depth, int.MinValue, int.MaxValue);
+        }
+        static int minmax(BitBoard board, int depth)
+        {
+            //使わない
+            if (board.turn >= 100)
+            {
+                return 0;
+            }
+            var next = BoardOps.GenBoard(board);
+            if (next.Count == 0)
+            {
+                if (board.wcheck & board.wturn) return -100 - depth;
+                if (board.bcheck & !board.wturn) return 100 + depth;
+                return 0;
+            }
+            if (depth == 0)
+            {
+                return
+                    (BitOperations.PopCount(board.wPawn) +
+                    //BitOperations.PopCount(board.wBishop) * 3 +
+                    BitOperations.PopCount(board.wKnight) * 3 +
+                    BitOperations.PopCount(board.wRook) * 5 +
+                    BitOperations.PopCount(board.wQueen) * 9 +
+                    BitOperations.PopCount(board.bPawn) * -1 +
+                    //BitOperations.PopCount(board.bBishop) * -3 +
+                    BitOperations.PopCount(board.bKnight) * -3 +
+                    BitOperations.PopCount(board.bRook) * -5 +
+                    BitOperations.PopCount(board.bQueen) * -9);
+            }
+            if (board.wturn)
+            {
+                int max = int.MinValue;
+                foreach (var a in next)
+                {
+                    int score = minmax(a.Item1, depth - 1);
+                    if (score > max) max = score;
+                }
+                return max;
+            }
+            else
+            {
+                int min = int.MaxValue;
+                foreach (var a in next)
+                {
+                    int score = minmax(a.Item1, depth - 1);
+                    if (score < min) min = score;
+                }
+                return min;
+            }
+
+        }
+        static int alphabeta(BitBoard board, int depth, int alpha, int beta)
+        {
+            if (board.turn >= 100)
+            {
+                return 0;
+            }
+            var next = BoardOps.GenBoard(board);
+            if (next.Count == 0)
+            {
+                if (board.wcheck & board.wturn) return -100 - depth;
+                if (board.bcheck & !board.wturn) return 100 + depth;
+                return 0;
+            }
+            if (depth == 0)
+            {
+                return
+                    (BitOperations.PopCount(board.wPawn) +
+                    //BitOperations.PopCount(board.wBishop) * 3 +
+                    BitOperations.PopCount(board.wKnight) * 3 +
+                    BitOperations.PopCount(board.wRook) * 5 +
+                    BitOperations.PopCount(board.wQueen) * 9 +
+                    BitOperations.PopCount(board.bPawn) * -1 +
+                    //BitOperations.PopCount(board.bBishop) * -3 +
+                    BitOperations.PopCount(board.bKnight) * -3 +
+                    BitOperations.PopCount(board.bRook) * -5 +
+                    BitOperations.PopCount(board.bQueen) * -9);
+            }
+            if (board.wturn)
+            {
+                foreach (var a in next)
+                {
+                    alpha = Math.Max(alpha, alphabeta(a.Item1, depth - 1, alpha, beta));
+                    if (alpha >= beta) break;
+                }
+                return alpha;
+            }
+            else
+            {
+                foreach (var a in next)
+                {
+                    beta = Math.Min(beta, alphabeta(a.Item1, depth - 1, alpha, beta));
+                    if (alpha >= beta) break;
+                }
+                return beta;
+            }
+        }
+        static int Negamax(BitBoard board, int depth, int alpha, int beta)
+        {
+            int color = board.wturn ? 1 : -1;
+            var next = BoardOps.GenBoard(board);
+            if (next.Count == 0)
+            {
+                if (board.wcheck & board.wturn) return -100 - depth;
+                if (board.bcheck & !board.wturn) return 100 + depth;
+                return 0;
+            }
+            if (depth == 0)
+            {
+                return color * (
+                    BitOperations.PopCount(board.wPawn) +
+                    // BitOperations.PopCount(board.wBishop) * 3 +
+                    BitOperations.PopCount(board.wKnight) * 3 +
+                    BitOperations.PopCount(board.wRook) * 5 +
+                    BitOperations.PopCount(board.wQueen) * 9 +
+                    BitOperations.PopCount(board.bPawn) * -1 +
+                    // BitOperations.PopCount(board.bBishop) * -3 +
+                    BitOperations.PopCount(board.bKnight) * -3 +
+                    BitOperations.PopCount(board.bRook) * -5 +
+                    BitOperations.PopCount(board.bQueen) * -9);
+            }
+
+            int maxEval = -int.MaxValue;
+            foreach (var a in next)
+            {
+                int eval = -Negamax(a.Item1, depth - 1, -beta, -alpha);
+                maxEval = Math.Max(maxEval, eval);
+                alpha = Math.Max(alpha, eval);
+                if (alpha >= beta) break;
+            }
+            return maxEval;
+        }
     }
 }
