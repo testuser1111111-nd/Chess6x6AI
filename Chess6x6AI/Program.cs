@@ -114,12 +114,12 @@ namespace Chess6x6AI
                 sw.Reset();
             }
         }
-        public const int limit = 1000000;
+        public const int limit = 10000;//traindata 1000000, test 10000
         static void Main()
         {
             //Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
             HashSet<BitBoard> set = new HashSet<BitBoard> ();
-            Random random = new Random (0);
+            Random random = new Random (1);//seed train:0 test:1
 
             while (set.Count<=limit)//dict.Keys.Count <= limit)//300000に後でする　今はプログラムのテスト
             {
@@ -152,7 +152,7 @@ namespace Chess6x6AI
                 }
             }
             //FileControl.Output(dict.Values.ToArray(),"traindata1");
-            FileControl.Output2(set, "traindata1");
+            FileControl.Output2(set, "testdata");
         }
     }
 }

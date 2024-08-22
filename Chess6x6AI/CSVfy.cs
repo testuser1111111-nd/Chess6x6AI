@@ -74,10 +74,10 @@ namespace Chess6x6AI
                         (i2[i * 8 + 1] ? 1 << 1 : 0) |
                         (i2[i * 8 + 0] ? 1 : 0));
                 }
-                data[2592] = (byte)(sbyte)BoardOps.EvalBoard(posarr[j], 4);//-127~127しかこないのでこれで
+                data[2592] = (byte)(sbyte)BoardOps.EvalBoard(posarr[j], 4);//-104~104しかこないのでこれで
                 strarr[j] = (Convert.ToBase64String(data));
             });
-            for(int i = 0;i< strarr.Length/100000; i++)
+            for(int i = 0;i< strarr.Length/100000; i++)//testdata生成時は少し書き替える必要がある
             {
                 StringBuilder sb = new StringBuilder();
                 for (int j = 0; (j < 100000) & i*100000 + j < strarr.Length; j++)
