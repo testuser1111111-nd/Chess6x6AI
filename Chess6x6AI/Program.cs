@@ -114,11 +114,14 @@ namespace Chess6x6AI
                 sw.Reset();
             }
         }
+        public const int limit = 1000000;
         static void Main()
         {
-            Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
-            Random random = new Random (42);
-            while (dict.Keys.Count <= 1000)//300000に後でする　今はプログラムのテスト
+            //Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
+            HashSet<BitBoard> set = new HashSet<BitBoard> ();
+            Random random = new Random (0);
+
+            while (set.Count<=limit)//dict.Keys.Count <= limit)//300000に後でする　今はプログラムのテスト
             {
                 BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
                 while (true)
@@ -126,23 +129,30 @@ namespace Chess6x6AI
                     //wturn
                     Console.WriteLine(test);
                     var nextmove = BoardOps.GenBoard (test);
-                    if(!dict.ContainsKey(test))dict.Add(test, (test.halfKP(), BoardOps.EvalBoard(test, 4)));
+
+                    //if(!dict.ContainsKey(test))dict.Add(test, (test.halfKP(), BoardOps.EvalBoard(test, 4)));
+                    set.Add(test);
                     if (nextmove.Count == 0) break;
                     if (test.turn >= 100) break;
                     test = nextmove[random.Next(nextmove.Count)].Item1;
-                    if (dict.Keys.Count > 100000) break;
+                    //if (dict.Keys.Count > limit) break;
+                    if(set.Count > limit) break;
                     //bturn
                     Console.WriteLine(test);
                     nextmove = BoardOps.GenBoard(test);
-                    if (!dict.ContainsKey(test)) dict.Add(test, (test.halfKP(), BoardOps.EvalBoard(test, 4)));
+                    //if (!dict.ContainsKey(test)) dict.Add(test, (test.halfKP(), BoardOps.EvalBoard(test, 4)));
+                    set.Add (test);
                     if (nextmove.Count == 0) break;
                     if(test.turn >= 100) break;
                     test = nextmove[random.Next(nextmove.Count)].Item1;
-                    if (dict.Keys.Count > 100000) break;
-                    Console.WriteLine(dict.Keys.Count);
+                    if(set.Count>limit) break;
+                    //if (dict.Keys.Count > limit) break;
+                   Console.WriteLine (set.Count);
+                    // Console.WriteLine(dict.Keys.Count);
                 }
             }
-            FileControl.Output(dict.Values.ToArray());
+            //FileControl.Output(dict.Values.ToArray(),"traindata1");
+            FileControl.Output2(set, "traindata1");
         }
     }
 }
