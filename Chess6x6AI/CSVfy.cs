@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TorchSharp;
 
 namespace Chess6x6AI
 {
@@ -45,11 +47,8 @@ namespace Chess6x6AI
         public static void Output2(HashSet<BitBoard> pos, string filename)
         {
             var posarr = pos.ToArray();
-            int evaled = 0;
             string[] strarr = new string[posarr.Length];
-            Parallel.For(0,Program.limit, j => {
-                if(evaled%100==0)Console.WriteLine("{0:D7}",evaled);
-                evaled++;
+            Parallel.For(0,Program.limit, j =>{
                 byte[] data = new byte[36 * 36 * 2 + 1];
                 bool[] i1 = posarr[j].halfKP().Item1;
                 bool[] i2 = posarr[j].halfKP().Item2;
@@ -75,6 +74,7 @@ namespace Chess6x6AI
                         (i2[i * 8 + 0] ? 1 : 0));
                 }
                 data[2592] = (byte)(sbyte)BoardOps.EvalBoard(posarr[j], 4);//-104~104しかこないのでこれで
+                
                 strarr[j] = (Convert.ToBase64String(data));
             });
             for(int i = 0;i< strarr.Length/100000; i++)//testdata生成時は少し書き替える必要がある
@@ -82,7 +82,7 @@ namespace Chess6x6AI
                 StringBuilder sb = new StringBuilder();
                 for (int j = 0; (j < 100000) & i*100000 + j < strarr.Length; j++)
                 {
-                    sb.AppendLine(strarr[i]);
+                    sb.AppendLine(strarr[j]);
                 }
                 File.WriteAllText(filename+i.ToString(), sb.ToString());
             }

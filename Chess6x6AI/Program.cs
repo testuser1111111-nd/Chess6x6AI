@@ -10,7 +10,7 @@ namespace Chess6x6AI
     internal class Program
     {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        static void Main(string[] args)//testing chess logic
+        static void Main2(string[] args)//testing chess logic
         {
             BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
             var nnue = new NNUEagent();
@@ -116,7 +116,7 @@ namespace Chess6x6AI
             }
         }
         public const int limit = 1000000;//traindata 1000000, test 10000
-        static void Main2()
+        static void Main()
         {
             //Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
             HashSet<BitBoard> set = new HashSet<BitBoard> ();
