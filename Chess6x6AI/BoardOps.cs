@@ -521,7 +521,7 @@ namespace Chess6x6AI
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
-        static char GetPiece(BitBoard board, ulong position)
+        static public char GetPiece(BitBoard board, ulong position)
         {
             char box = ' ';
             if ((board.wPawn & position) > 0) box = 'P';

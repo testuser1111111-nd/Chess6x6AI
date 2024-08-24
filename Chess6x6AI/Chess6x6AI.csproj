@@ -8,7 +8,7 @@
     <PublishAot>false</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<Optimize>true</Optimize>
+	<Optimize>false</Optimize>
 	<Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 

@@ -10,9 +10,10 @@ namespace Chess6x6AI
     internal class Program
     {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        static void Main3(string[] args)
+        static void Main(string[] args)//testing chess logic
         {
             BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
+            var nnue = new NNUEagent();
             Console.WriteLine(test);
             Stopwatch sw = new Stopwatch();
             while (true)
@@ -114,14 +115,14 @@ namespace Chess6x6AI
                 sw.Reset();
             }
         }
-        public const int limit = 10000;//traindata 1000000, test 10000
-        static void Main()
+        public const int limit = 1000000;//traindata 1000000, test 10000
+        static void Main2()
         {
             //Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
             HashSet<BitBoard> set = new HashSet<BitBoard> ();
-            Random random = new Random (1);//seed train:0 test:1
+            Random random = new Random (0);//seed train:0 test:1
 
-            while (set.Count<=limit)//dict.Keys.Count <= limit)//300000に後でする　今はプログラムのテスト
+            while (set.Count<=limit)
             {
                 BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
                 while (true)
@@ -151,8 +152,9 @@ namespace Chess6x6AI
                     // Console.WriteLine(dict.Keys.Count);
                 }
             }
-            //FileControl.Output(dict.Values.ToArray(),"traindata1");
-            FileControl.Output2(set, "testdata");
+            //FileControl.Output(dict.Values.ToArray(),"traindata1");//deprecated
+            FileControl.Output2(set, "traindata");
+            //FileControl.Output2(set, "testdata");
         }
     }
 }
