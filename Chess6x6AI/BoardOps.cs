@@ -649,7 +649,7 @@ namespace Chess6x6AI
             if (next.Count == 0)
             {
                 if (board.wcheck & board.wturn) return -100 - depth;
-                if (board.bcheck & !board.wturn) return 100 + depth;
+                if (board.bcheck & !board.wturn) return -100 - depth;
                 return 0;
             }
             if (depth == 0)

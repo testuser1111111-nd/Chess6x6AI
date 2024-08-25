@@ -10,7 +10,7 @@ namespace Chess6x6AI
     internal class Program
     {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        static void Main2(string[] args)//testing chess logic
+        static void Main(string[] args)//チェステスト用
         {
             BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
             var nnue = new NNUEagent();
@@ -18,6 +18,7 @@ namespace Chess6x6AI
             Stopwatch sw = new Stopwatch();
             while (true)
             {
+                ///*
                 try
                 {
                     string move = Console.ReadLine();
@@ -42,6 +43,7 @@ namespace Chess6x6AI
                     Console.WriteLine(e.Message);
                     continue;
                 }
+                //*/
                 Console.WriteLine(test);
                 var next = BoardOps.GenBoard(test);
 
@@ -68,13 +70,14 @@ namespace Chess6x6AI
                 }
                 //*
                 BitBoard minboard = null;
-                int score = int.MinValue;
+                float score = int.MinValue;
                 int ncur= 0, nfin = 0;
                 char np = ' ';
                 int rems = BitOperations.PopCount(test.wall | test.ball);
                 foreach(var a in next)
                 {
-                    var eval = -BoardOps.EvalBoard(a.Item1, 4);//実質5手見てる
+                    //var eval = -BoardOps.EvalBoard(a.Item1, 4);//実質5手見てる
+                    var eval = -nnue.EvalBoard(a.Item1, 3);
                     if (eval > score)
                     {
                         score = eval;
@@ -116,13 +119,13 @@ namespace Chess6x6AI
             }
         }
         public const int limit = 1000000;//traindata 1000000, test 10000
-        static void Main()
+        static void Main2()//訓練データ生成用
         {
             //Dictionary <BitBoard, ((bool[], bool[]),int)> dict = new Dictionary<BitBoard, ((bool[], bool[]), int)> ();
             HashSet<BitBoard> set = new HashSet<BitBoard> ();
-            Random random = new Random (0);//seed train:0 test:1
+            Random random = new Random (4);//seed train:0,2,3,4,5 test:1
 
-            while (set.Count<=limit)
+            while (set.Count<limit)
             {
                 BitBoard test = new BitBoard(true, 18, 18 * (1uL << 30), 33, 33 * (1uL << 30), 4, 4 * (1uL << 30), 8, 8 * (1uL << 30));
                 while (true)
@@ -137,7 +140,7 @@ namespace Chess6x6AI
                     if (test.turn >= 100) break;
                     test = nextmove[random.Next(nextmove.Count)].Item1;
                     //if (dict.Keys.Count > limit) break;
-                    if(set.Count > limit) break;
+                    if(set.Count >= limit) break;
                     //bturn
                     Console.WriteLine(test);
                     nextmove = BoardOps.GenBoard(test);
@@ -146,14 +149,14 @@ namespace Chess6x6AI
                     if (nextmove.Count == 0) break;
                     if(test.turn >= 100) break;
                     test = nextmove[random.Next(nextmove.Count)].Item1;
-                    if(set.Count>limit) break;
+                    if(set.Count>=limit) break;
                     //if (dict.Keys.Count > limit) break;
                    Console.WriteLine (set.Count);
                     // Console.WriteLine(dict.Keys.Count);
                 }
             }
             //FileControl.Output(dict.Values.ToArray(),"traindata1");//deprecated
-            FileControl.Output2(set, "traindata");
+            FileControl.Output2(set, "traindata3");
             //FileControl.Output2(set, "testdata");
         }
     }

@@ -48,7 +48,10 @@ namespace Chess6x6AI
         {
             var posarr = pos.ToArray();
             string[] strarr = new string[posarr.Length];
+            int evaled = 0;
             Parallel.For(0,Program.limit, j =>{
+                evaled++;
+                if (evaled % 100 == 0) Console.WriteLine(evaled);
                 byte[] data = new byte[36 * 36 * 2 + 1];
                 bool[] i1 = posarr[j].halfKP().Item1;
                 bool[] i2 = posarr[j].halfKP().Item2;
@@ -77,7 +80,7 @@ namespace Chess6x6AI
                 
                 strarr[j] = (Convert.ToBase64String(data));
             });
-            for(int i = 0;i< strarr.Length/100000; i++)//testdata生成時は少し書き替える必要がある
+            for(int i = 0;i< (strarr.Length+99999)/100000; i++)//testdata生成時は少し書き替える必要がある
             {
                 StringBuilder sb = new StringBuilder();
                 for (int j = 0; (j < 100000) & i*100000 + j < strarr.Length; j++)
