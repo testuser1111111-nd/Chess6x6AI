@@ -3,8 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using static Tensorboard.CostGraphDef.Types;
-using static TorchSharp.torch;
 namespace Chess6x6AI
 {
     internal class Program

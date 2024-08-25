@@ -15,8 +15,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
-    <PackageReference Include="TorchSharp" Version="0.103.0" />
-    <PackageReference Include="TorchSharp-cuda-windows" Version="0.103.0" />
   </ItemGroup>
 
   <ItemGroup>
