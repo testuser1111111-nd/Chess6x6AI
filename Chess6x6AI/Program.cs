@@ -76,7 +76,7 @@ namespace Chess6x6AI
                 int rems = BitOperations.PopCount(test.wall | test.ball);
                 foreach(var a in next)
                 {
-                    //var eval = -BoardOps.EvalBoard(a.Item1, 4);//実質5手見てる
+                    //var eval = -BoardOps.EvalBoard(a.Item1, 4);
                     var eval = -nnue.EvalBoard(a.Item1, 3);
                     if (eval > score)
                     {
